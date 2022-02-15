@@ -19,18 +19,10 @@ st.title('Análisis de México en las Olimpiadas')
 st.header('¿El rendimiento mexicano ha decaído?')
 st.text('Resolveremos esta pregunta analizando los datos de los atletas olímpicos')
 
-# Listar a los atletas por invierno o por verano
+# Listar a los atletas por verano
 st.header('Lista de atletas mexicanos por temporada')
-option = st.selectbox(
-    'Tipo de Olimpiadas',
-    ('Verano', 'Invierno'))
 
-if option=='Verano':
-    season='Summer'
-else:
-    season='Winter'
-
-datos_mexico_temporada=datos_mexico[datos_mexico.Season==season]    
+datos_mexico_temporada=datos_mexico[datos_mexico.Season=="Summer"]    
 st.dataframe(datos_mexico_temporada)
 
 # Graficar las medallas por cada deporte
