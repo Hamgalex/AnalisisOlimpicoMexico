@@ -102,6 +102,8 @@ st.pyplot(fig)
 # Predecir las medallas en los siguientes años
 st.header('Predicción')
 
+# Regresión Lineal
+
 regressor = LinearRegression()
 
 X = años.iloc[:,:-1].values  
@@ -114,36 +116,8 @@ fig = plt.figure(figsize = (10, 5))
 p1=plt.scatter(X, y) 
 p2=plt.plot(X_train, regressor.predict(X_train), color='firebrick') 
 
-
-
 plt.title("Años y medallas olímpicas") 
 plt.xlabel('Año', fontweight ='bold', fontsize = 15)
 plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
-
-st.pyplot(fig)
-
-
-#
-#
-# Regresión polinómica
-
-lin_reg=LinearRegression()
-lin_reg.fit(X,y)
-
-poly_reg=PolynomialFeatures(degree=4)
-X_poly=poly_reg.fit_transform(X)
-poly_reg.fit(X_poly,y)
-lin_reg2=LinearRegression()
-lin_reg2.fit(X_poly,y)
-
-
-X_grid=np.arange(min(X),max(X),0.1)
-X_grid=X_grid.reshape((len(X_grid),1))
-plt.scatter(X,y,color='red')
-plt.plot(X,lin_reg2.predict(poly_reg.fit_transform(X)),color='blue')
-plt.title("Años y medallas olímpicas") 
-plt.xlabel('Año', fontweight ='bold', fontsize = 15)
-plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
-plt.show()
 
 st.pyplot(fig)
