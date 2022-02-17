@@ -1,11 +1,12 @@
 from cmath import nan
+from tokenize import Number
 import streamlit as st
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-
+from sklearn.preprocessing import PolynomialFeatures
 
 # Leer csv's
 atletas = pd.read_csv("datasets/athlete_events.csv",encoding='utf-8')
@@ -13,9 +14,9 @@ regiones = pd.read_csv("datasets/noc_regions.csv",encoding='utf-8')
 
 # Mergear los dos dataframe
 datos = pd.merge(atletas, regiones, on='NOC', how='left')
-datos.replace(to_replace="é", value="e")
+
 # Obtener datos México
-datos_mexico=datos[(datos.Team == 'Mexico')]
+datos_mexico=datos[(datos.NOC == 'MEX')]
 
 st.title('Análisis de México en las Olimpiadas')
 st.header('¿El rendimiento mexicano ha decaído?')
@@ -36,20 +37,45 @@ medalla_oro=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
 medalla_plata=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
 medalla_bronce=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
 
+
+
 deportes_medalla_oro=medalla_oro.Sport.value_counts().reset_index(name='Gold')
+deportes_medalla_oro.rename(columns = {'index':'deporte'}, inplace = True)
+
 deportes_medalla_plata=medalla_plata.Sport.value_counts().reset_index(name='Silver')
+deportes_medalla_plata.rename(columns = {'index':'deporte'}, inplace = True)
+
 deportes_medalla_bronce=medalla_bronce.Sport.value_counts().reset_index(name='Bronze')
+deportes_medalla_bronce.rename(columns = {'index':'deporte'}, inplace = True)
 
-medallas=deportes_medalla_oro.set_index('index').join(deportes_medalla_plata.set_index('index'), how='outer').join(deportes_medalla_bronce.set_index('index'), how='outer')
 
-fig = plt.figure(figsize = (6, 8))
-p1 = plt.barh(medallas.index, medallas.Gold,color="gold")
-p2= plt.barh(medallas.index, medallas.Silver,color="silver")
-p3= plt.barh(medallas.index, medallas.Bronze,color="goldenrod")
+
+medallas= pd.merge(deportes_medalla_oro, deportes_medalla_plata, on ='deporte', how ="outer")
+medallas= pd.merge(medallas, deportes_medalla_bronce, on ='deporte', how ="outer")
+
+medallas.fillna(value = 0,
+          inplace = True)
+
+deportes=medallas['deporte']
+numbronce=medallas['Bronze'].to_list()
+numplata=medallas['Silver'].to_list()
+numoro=medallas['Gold'].to_list()
+my_list = np.array([numbronce,numplata])
+
+my_list=np.sum(my_list, axis=0)
+
+
+fig = plt.figure(figsize = (6, 7))
+
+b1 = plt.barh(deportes, numbronce,color='goldenrod')
+b2 = plt.barh(deportes, numplata,left=numbronce,color='silver')
+b3 = plt.barh(deportes, numoro,left=my_list,color='gold')
+plt.legend([b1, b2,b3], ["Bronce", "Plata","Oro"], title="Medallas", loc="upper right")
+
 plt.title("Medallas olímpicas por deporte") 
-plt.xlabel('Número de Medallas', fontweight ='bold', fontsize = 15)
+plt.xlabel('Número de medallas', fontweight ='bold', fontsize = 15)
 plt.ylabel('Deporte', fontweight ='bold', fontsize = 15)
-plt.legend((p1[0], p2[0],p3[0]), ('Oro', 'Plata','Bronce'))
+
 st.pyplot(fig)
 
 
@@ -63,9 +89,6 @@ año_con_medallas=datos_mexico_temporada[datos_mexico_temporada.Medal.isin(medal
 años=año_con_medallas.Year.value_counts().reset_index(name='count')
 años.rename(columns = {'index':'year'}, inplace = True)
 años.sort_values(by="year", inplace=True)
-
-
-# st.dataframe(años)
 
 fig = plt.figure(figsize = (10, 5))
 plt.scatter(años['year'],años['count'])
@@ -96,4 +119,31 @@ p2=plt.plot(X_train, regressor.predict(X_train), color='firebrick')
 plt.title("Años y medallas olímpicas") 
 plt.xlabel('Año', fontweight ='bold', fontsize = 15)
 plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
+
+st.pyplot(fig)
+
+
+#
+#
+# Regresión polinómica
+
+lin_reg=LinearRegression()
+lin_reg.fit(X,y)
+
+poly_reg=PolynomialFeatures(degree=4)
+X_poly=poly_reg.fit_transform(X)
+poly_reg.fit(X_poly,y)
+lin_reg2=LinearRegression()
+lin_reg2.fit(X_poly,y)
+
+
+X_grid=np.arange(min(X),max(X),0.1)
+X_grid=X_grid.reshape((len(X_grid),1))
+plt.scatter(X,y,color='red')
+plt.plot(X,lin_reg2.predict(poly_reg.fit_transform(X)),color='blue')
+plt.title("Años y medallas olímpicas") 
+plt.xlabel('Año', fontweight ='bold', fontsize = 15)
+plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
+plt.show()
+
 st.pyplot(fig)
