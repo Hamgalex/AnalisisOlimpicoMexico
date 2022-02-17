@@ -3,6 +3,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
 
 # Leer csv's
 atletas = pd.read_csv("datasets/athlete_events.csv",encoding='utf-8')
@@ -43,6 +46,7 @@ fig = plt.figure(figsize = (6, 8))
 p1 = plt.barh(medallas.index, medallas.Gold,color="gold")
 p2= plt.barh(medallas.index, medallas.Silver,color="silver")
 p3= plt.barh(medallas.index, medallas.Bronze,color="goldenrod")
+plt.title("Medallas olímpicas por deporte") 
 plt.xlabel('Número de Medallas', fontweight ='bold', fontsize = 15)
 plt.ylabel('Deporte', fontweight ='bold', fontsize = 15)
 plt.legend((p1[0], p2[0],p3[0]), ('Oro', 'Plata','Bronce'))
@@ -56,10 +60,40 @@ st.pyplot(fig)
 st.header('Medallas por año')
 medallas=['Gold','Silver','Bronze']
 año_con_medallas=datos_mexico_temporada[datos_mexico_temporada.Medal.isin(medallas)]
-años=año_con_medallas.Year.value_counts().reset_index(name='Year').set_index('index')
-años.sort_values(by="index", inplace=True)
+años=año_con_medallas.Year.value_counts().reset_index(name='count')
+años.rename(columns = {'index':'year'}, inplace = True)
+años.sort_values(by="year", inplace=True)
+
+
 # st.dataframe(años)
 
 fig = plt.figure(figsize = (10, 5))
-plt.plot(años.index,años.Year)
+plt.scatter(años['year'],años['count'])
+plt.title("Años y medallas olímpicas") 
+plt.xlabel('Año', fontweight ='bold', fontsize = 15)
+plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
+st.pyplot(fig)
+
+#
+#
+# Predecir las medallas en los siguientes años
+st.header('Predicción')
+
+regressor = LinearRegression()
+
+X = años.iloc[:,:-1].values  
+y = años.iloc[:,1].values 
+
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=1/3,random_state=0)
+regressor.fit(X_train, y_train)
+
+fig = plt.figure(figsize = (10, 5))
+p1=plt.scatter(X, y) 
+p2=plt.plot(X_train, regressor.predict(X_train), color='firebrick') 
+
+
+
+plt.title("Años y medallas olímpicas") 
+plt.xlabel('Año', fontweight ='bold', fontsize = 15)
+plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
 st.pyplot(fig)
