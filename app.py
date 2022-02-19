@@ -33,7 +33,26 @@ medalla_oro=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
 medalla_plata=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
 medalla_bronce=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
 
+
+
+
+medalla_oro = medalla_oro.drop_duplicates(
+  subset = ['Year', 'Sport'],
+  keep = 'last').reset_index(drop = True)
+
+medalla_plata = medalla_plata.drop_duplicates(
+  subset = ['Year', 'Sport'],
+  keep = 'last').reset_index(drop = True)
+
+medalla_bronce = medalla_bronce.drop_duplicates(
+  subset = ['Year', 'Sport'],
+  keep = 'last').reset_index(drop = True)
+
+
+
+
 st.write("Ahora veremos las medallas por cada año, vi")
+
 #
 #
 # Graficar las medallas por año
@@ -50,6 +69,7 @@ años= pd.merge(años, año_medalla_bronce, on ='año', how ="outer")
 años.fillna(value = 0,
           inplace = True)
 años.sort_values(by="año", inplace=True)
+
 
 año_y_medalla=años['año']
 num_bronce_por_año=años['Bronze'].to_list()
@@ -80,13 +100,14 @@ st.pyplot(fig)
 # Graficar las medallas por cada deporte
 st.header('Medallas por deporte')
 
-deportes_medalla_oro=medalla_oro.Sport.value_counts().reset_index(name='Gold')
+
+deportes_medalla_oro=medalla_oro.Event.value_counts().reset_index(name='Gold')
 deportes_medalla_oro.rename(columns = {'index':'deporte'}, inplace = True)
 
-deportes_medalla_plata=medalla_plata.Sport.value_counts().reset_index(name='Silver')
+deportes_medalla_plata=medalla_plata.Event.value_counts().reset_index(name='Silver')
 deportes_medalla_plata.rename(columns = {'index':'deporte'}, inplace = True)
 
-deportes_medalla_bronce=medalla_bronce.Sport.value_counts().reset_index(name='Bronze')
+deportes_medalla_bronce=medalla_bronce.Event.value_counts().reset_index(name='Bronze')
 deportes_medalla_bronce.rename(columns = {'index':'deporte'}, inplace = True)
 
 medallas= pd.merge(deportes_medalla_oro, deportes_medalla_plata, on ='deporte', how ="outer")
@@ -143,7 +164,7 @@ p2=plt.plot(X_train, regressor.predict(X_train), color='gold')
 plt.title("Años y medallas de Oro") 
 plt.xlabel('Año', fontweight ='bold', fontsize = 15)
 plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
-plt.ylim([0.5, 17])
+plt.ylim([0.5, 4])
 st.pyplot(fig)
 
 # y2
@@ -155,7 +176,7 @@ p2=plt.plot(X_train, regressor.predict(X_train), color='silver')
 plt.title("Años y medallas de Plata") 
 plt.xlabel('Año', fontweight ='bold', fontsize = 15)
 plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
-plt.ylim([0.5, 17])
+plt.ylim([0.5, 4])
 st.pyplot(fig)
 
 #y3
@@ -167,7 +188,7 @@ p2=plt.plot(X_train, regressor.predict(X_train), color='goldenrod')
 plt.title("Años y medallas de Bronce") 
 plt.xlabel('Año', fontweight ='bold', fontsize = 15)
 plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
-plt.ylim([0.5, 17])
+plt.ylim([0.5, 4])
 st.pyplot(fig)
 
 
