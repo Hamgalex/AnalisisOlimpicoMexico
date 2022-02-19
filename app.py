@@ -28,6 +28,10 @@ st.header('Lista de atletas mexicanos por temporada')
 datos_mexico_temporada=datos_mexico[datos_mexico.Season=="Summer"]    
 st.dataframe(datos_mexico_temporada)
 
+nombremedallas=['Gold','Silver','Bronze']
+
+medallistas=datos_mexico_temporada[datos_mexico_temporada.Medal.isin(nombremedallas)]
+
 medalla_oro_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
 medalla_plata_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
 medalla_bronce_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
@@ -125,27 +129,68 @@ st.pyplot(fig)
 # Distribución de edades por cada medalla
 
 # Oro
-medalla_oro_original_distribucion = medalla_oro_original[np.isfinite(medalla_oro_original['Age'])]
+medallistas_edades_distribucion = medallistas[np.isfinite(medallistas['Age'])]
 fig = plt.figure(figsize=(10, 5))
 plt.tight_layout()
-sns.countplot(medalla_oro_original_distribucion['Age'])
-plt.title('Distribución de Medallas de Oro')
+sns.countplot(medallistas_edades_distribucion['Age'])
+plt.title('Distribución de Edad de Medallistas')
 st.pyplot(fig)
 
-# Plata
-medalla_plata_original_distribucion = medalla_plata_original[np.isfinite(medalla_plata_original['Age'])]
-fig = plt.figure(figsize=(10, 5))
-plt.tight_layout()
-sns.countplot(medalla_plata_original_distribucion['Age'])
-plt.title('Distribución de Medallas de Plata')
+
+#
+#
+# Sexos a través del tiempo
+
+medallistas_hombres = datos_mexico_temporada[datos_mexico_temporada.Sex == 'M']
+medallistas_mujeres = datos_mexico_temporada[datos_mexico_temporada.Sex == 'F']
+
+# Hombres
+hombres_grafica = medallistas_hombres.groupby('Year')['Sex'].value_counts()
+fig= plt.figure(figsize=(10, 5))
+plt.plot(hombres_grafica.loc[:,'M'])
+plt.title('Variación de atletas hombres a través del tiempo')
 st.pyplot(fig)
 
-# Bronce
-medalla_bronce_original_distribucion = medalla_bronce_original[np.isfinite(medalla_bronce_original['Age'])]
-fig = plt.figure(figsize=(10, 5))
-plt.tight_layout()
-sns.countplot(medalla_bronce_original_distribucion['Age'])
-plt.title('Distribución de Medallas de Bronce')
+
+# Mujeres
+mujeres_grafica = medallistas_mujeres.groupby('Year')['Sex'].value_counts()
+fig= plt.figure(figsize=(10, 5))
+plt.plot(mujeres_grafica.loc[:,'F'])
+plt.title('Variación de atletas mujeres a través del tiempo')
+st.pyplot(fig)
+
+#
+#
+# Variación de Peso a través de los años
+
+# Hombres
+fig= plt.figure(figsize=(10, 5))
+sns.pointplot('Year', 'Weight', data=medallistas_hombres)
+plt.title('Variación del Peso de atletas hombres a través del tiempo')
+st.pyplot(fig)
+
+
+# Hombres
+fig= plt.figure(figsize=(10, 5))
+sns.pointplot('Year', 'Weight', data=medallistas_mujeres)
+plt.title('Variación del Peso de atletas Mujeres a través del tiempo')
+st.pyplot(fig)
+
+
+#
+#
+# Variación de altura a través de los años
+
+# Hombres
+fig= plt.figure(figsize=(10, 5))
+sns.pointplot('Year', 'Height', data=medallistas_hombres, palette='Set2')
+plt.title('Variation of Height for Male Athletes over time')
+st.pyplot(fig)
+
+# Mujeres
+fig= plt.figure(figsize=(10, 5))
+sns.pointplot('Year', 'Height', data=medallistas_mujeres, palette='Set2')
+plt.title('Variation of Height for Female Athletes over time')
 st.pyplot(fig)
 
 #
