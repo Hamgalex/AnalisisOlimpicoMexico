@@ -33,7 +33,7 @@ medalla_oro=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
 medalla_plata=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
 medalla_bronce=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
 
-
+st.write("Ahora veremos las medallas por cada año, vi")
 #
 #
 # Graficar las medallas por año
@@ -51,20 +51,34 @@ años.fillna(value = 0,
           inplace = True)
 años.sort_values(by="año", inplace=True)
 
+año_y_medalla=años['año']
+num_bronce_por_año=años['Bronze'].to_list()
+num_plata_por_año=años['Silver'].to_list()
+num_oro_por_año=años['Gold'].to_list()
+lista_para_años = np.array([num_bronce_por_año,num_plata_por_año])
+
+lista_para_años=np.sum(lista_para_años, axis=0)
+
+
 fig = plt.figure(figsize = (10, 5))
-plt.scatter(años['año'],años['Gold'],color='gold')
-plt.scatter(años['año'],años['Silver'],color='silver')
-plt.scatter(años['año'],años['Bronze'],color='goldenrod')
-plt.title("Años y medallas olímpicas") 
-plt.xlabel('Año', fontweight ='bold', fontsize = 15)
-plt.ylabel('Número de medallas', fontweight ='bold', fontsize = 15)
+
+b1 = plt.bar(año_y_medalla, num_bronce_por_año,3,color='goldenrod')
+b2 = plt.bar(año_y_medalla, num_plata_por_año,3,bottom=num_bronce_por_año,color='silver')
+b3 = plt.bar(año_y_medalla, num_oro_por_año,3,bottom=lista_para_años,color='gold')
+plt.legend([b1, b2,b3], ["Bronce", "Plata","Oro"], title="Medallas", loc="upper left")
+
+plt.title("Medallas olímpicas por año") 
+plt.xlabel('Número de medallas', fontweight ='bold', fontsize = 15)
+plt.ylabel('Año', fontweight ='bold', fontsize = 15)
+
 st.pyplot(fig)
+
+
+
 #
 #
 # Graficar las medallas por cada deporte
 st.header('Medallas por deporte')
-
-
 
 deportes_medalla_oro=medalla_oro.Sport.value_counts().reset_index(name='Gold')
 deportes_medalla_oro.rename(columns = {'index':'deporte'}, inplace = True)
