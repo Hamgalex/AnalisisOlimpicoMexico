@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-
+import seaborn as sns
 
 # Leer csv's
 atletas = pd.read_csv("datasets/athlete_events.csv",encoding='utf-8')
@@ -28,23 +28,23 @@ st.header('Lista de atletas mexicanos por temporada')
 datos_mexico_temporada=datos_mexico[datos_mexico.Season=="Summer"]    
 st.dataframe(datos_mexico_temporada)
 
-medalla_oro=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
-medalla_plata=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
-medalla_bronce=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
+medalla_oro_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Gold']
+medalla_plata_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Silver']
+medalla_bronce_original=datos_mexico_temporada[datos_mexico_temporada.Medal=='Bronze']
 
-medalla_oro = medalla_oro.drop_duplicates(
+medalla_oro = medalla_oro_original.drop_duplicates(
   subset = ['Year', 'Event'],
   keep = 'last').reset_index(drop = True)
 
-medalla_plata = medalla_plata.drop_duplicates(
+medalla_plata = medalla_plata_original.drop_duplicates(
   subset = ['Year', 'Event'],
   keep = 'last').reset_index(drop = True)
 
-medalla_bronce = medalla_bronce.drop_duplicates(
+medalla_bronce = medalla_bronce_original.drop_duplicates(
   subset = ['Year', 'Event'],
   keep = 'last').reset_index(drop = True)
 
-st.write("Ahora veremos las medallas por cada año, vi")
+st.write("Ahora veremos las medallas por cada año. Hay que tener en cuenta que en los deportes por equipo solamente se cuenta como una medalla.")
 
 #
 #
@@ -120,7 +120,33 @@ plt.ylabel('Deporte', fontweight ='bold', fontsize = 15)
 
 st.pyplot(fig)
 
+#
+#
+# Distribución de edades por cada medalla
 
+# Oro
+medalla_oro_original_distribucion = medalla_oro_original[np.isfinite(medalla_oro_original['Age'])]
+fig = plt.figure(figsize=(10, 5))
+plt.tight_layout()
+sns.countplot(medalla_oro_original_distribucion['Age'])
+plt.title('Distribución de Medallas de Oro')
+st.pyplot(fig)
+
+# Plata
+medalla_plata_original_distribucion = medalla_plata_original[np.isfinite(medalla_plata_original['Age'])]
+fig = plt.figure(figsize=(10, 5))
+plt.tight_layout()
+sns.countplot(medalla_plata_original_distribucion['Age'])
+plt.title('Distribución de Medallas de Plata')
+st.pyplot(fig)
+
+# Bronce
+medalla_bronce_original_distribucion = medalla_bronce_original[np.isfinite(medalla_bronce_original['Age'])]
+fig = plt.figure(figsize=(10, 5))
+plt.tight_layout()
+sns.countplot(medalla_bronce_original_distribucion['Age'])
+plt.title('Distribución de Medallas de Bronce')
+st.pyplot(fig)
 
 #
 #
