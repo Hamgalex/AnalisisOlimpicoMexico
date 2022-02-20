@@ -198,16 +198,39 @@ st.pyplot(fig)
 # Predecir las medallas en los siguientes años
 st.header('Predicción')
 
+años['total'] = (años['Gold']*5 + años['Silver']*3+ años['Bronze'])
+
 regressor = LinearRegression()
 X = años['año'].values.reshape(-1, 1)
 y1 = años['Gold'].values
 y2 = años['Silver'].values
 y3 = años['Bronze'].values
-X_train, X_test, y_train, y_test = train_test_split(X,y1,random_state=0)
+total=años['total'].values
+
+st.dataframe(años)
+
+
+X_train, X_test, y_train, y_test = train_test_split(X,total,random_state=0)
 regressor.fit(X_train, y_train)
+fig = plt.figure(figsize = (10, 5))
+p1=plt.scatter(X, total) 
+p2=plt.plot(X_train, regressor.predict(X_train), color='firebrick') 
+st.pyplot(fig)
+
+
+#
+#
+# Predicción por cada tipo de medalla
+
+
+
+
+
 
 #y1
 fig = plt.figure(figsize = (10, 5))
+X_train, X_test, y_train, y_test = train_test_split(X,y1,random_state=0)
+regressor.fit(X_train, y_train)
 p1=plt.scatter(X, y1,color="gold") 
 p2=plt.plot(X_train, regressor.predict(X_train), color='darkgoldenrod') 
 plt.title("Años y medallas de Oro") 
